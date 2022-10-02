@@ -1,0 +1,267 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean UI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+        body {
+            padding : 20px;
+        }
+        * {
+            font-family: 'Inter', sans-serif;
+            cursor : none !important;
+            transition: box-shadow 0.2s;
+        }
+        .front {
+            z-index : 11 !important;
+            position : relative;
+            box-shadow : 0px 5px 10px rgba(0,0,0,0.5);
+        }
+        #hoverPane {
+            border-radius : 10px;
+            background-color : rgba(0,0,0,0);
+            box-shadow: 0px 5px 10px rgba(0,0,0,0.4);
+            /*Allow clickthrough*/
+            pointer-events: none;
+            z-index: 1;
+            backdrop-filter: blur(3px);
+        }
+        button {
+            border-radius : 7px;
+            padding : 10px 20px;
+            background-color : transparent;
+            border : 0;
+            color : black;
+            font-weight : bold;
+            /*Allow clickthrough*/
+            pointer-events: none;
+            display : inline;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .navbar {
+            padding : 10px;
+            border-radius : 17px;
+            background: rgba(0, 0, 0, 0.1);
+            width : 100%;
+        }
+        img {
+            border-radius : 10px;
+            width : 100%;
+            height : auto;
+            margin-top : 10px;
+            margin-bottom : 10px;
+        }
+        input {
+            border-radius : 7px;
+            padding : 10px;
+            background-color : transparent;
+            border : 0;
+            color : black;
+            font-weight : bold;
+            display : inline;
+            margin : 5px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        input[type="checkbox"] {
+            display : inline;
+            width : 20px;
+            height : 20px;
+            margin : 10px;
+        }
+        label {
+            font-weight: bold;
+            display: inline;
+            position: relative;
+            top: -4px;
+        }
+        /*Style darkMode*/
+        .darkMode {
+            background-color : black;
+            color : white;
+        }
+        .darkMode input {
+            background-color : rgba(255,255,255,0.15);
+            color : white;
+        }
+        .darkMode button {
+            background-color : rgba(255,255,255,0.15);
+            color : white;
+        }
+        .darkMode label {
+            color : white;
+        }
+        .darkMode .navbar {
+            background-color : rgba(255,255,255,0.15);
+        }   
+        /* Add shadows to everything */
+        input {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            -webkit-transition: box-shadow 0.3s;
+            transition: box-shadow 0.3s;
+        }
+        .navbar {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            -webkit-transition: box-shadow 0.3s;
+            transition: box-shadow 0.3s;
+        }
+        button {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            -webkit-transition: box-shadow 0.3s;
+            transition: box-shadow 0.3s;
+        }
+        img {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            -webkit-transition: box-shadow 0.3s;
+            transition: box-shadow 0.3s;
+        }
+        input[type="range"] {
+            box-shadow : none;
+        }
+    </style>
+</head>
+<body class="">
+    <div class="navbar">
+        <button pretty-hover="default">A</button>
+        <button pretty-hover="default">B</button>
+        <button pretty-hover="default">C</button>
+    </div>
+    <br>
+    <br>
+    <input type="text" placeholder="Search" pretty-hover="default"/>
+    <br>
+    <input type="range" placeholder="Slider" pretty-hover="default"/>
+    <br>
+    <input type="checkbox" placeholder="Checkbox" pretty-hover="default"/><label pretty-hover="default">Checkbox</label>
+    <br>
+    <input type="text" placeholder="Text" pretty-hover="default"/>
+    <input type="password" placeholder="Password" pretty-hover="default"/>
+    <input type="email" placeholder="Email" pretty-hover="default"/>
+    <input type="url" placeholder="URL" pretty-hover="default"/>
+    <input type="tel" placeholder="Phone" pretty-hover="default"/>
+    <input type="number" placeholder="Number" pretty-hover="default"/>
+    <img src="https://source.unsplash.com/random/1920x1080/?wallpaper,landscape" pretty-hover="default">
+    <div id="hoverPane"></div>
+    <script>
+        var targetRectCenterX = 0;
+        var targetRectCenterY = 0;
+        var targetRectWidth = 0;
+        var targetRectHeight = 0;
+
+        var hoverRectCenterX = 0;
+        var hoverRectCenterY = 0;
+        var hoverRectWidth = 0;
+        var hoverRectHeight = 0;
+
+        var hoverXVelocity = 0;
+        var hoverYVelocity = 0;
+        var hoverScaleXVelocity = 0;
+        var hoverScaleYVelocity = 0;
+
+        var previousHover;
+        var currentHover;
+
+        var hoverPane = document.getElementById("hoverPane");
+
+        var clientX = 0;
+        var clientY = 0;
+        
+        window.onmousemove = function(e) {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+
+        setInterval(()=>{
+            // Get any elements with pretty-hover = default and if mouse hovering set target rect
+
+            var targetRectCenterX = clientX;
+            var targetRectCenterY = clientY;
+            var targetRectWidth = 0;
+            var targetRectHeight = 0;
+
+            var lerpSpeed = 0.07;
+
+            var radius = 10;
+
+            currentHover = null;
+
+            var elements = document.querySelectorAll("[pretty-hover='default']");
+            for(var i = 0; i < elements.length; i++) {
+                var element = elements[i];
+                if(element.getBoundingClientRect().top <= clientY && element.getBoundingClientRect().bottom >= clientY && element.getBoundingClientRect().left <= clientX && element.getBoundingClientRect().right >= clientX) {
+                    targetRectCenterX = element.getBoundingClientRect().left + (element.getBoundingClientRect().width / 2);
+                    targetRectCenterY = element.getBoundingClientRect().top + (element.getBoundingClientRect().height / 2);
+                    targetRectWidth = element.getBoundingClientRect().width;
+                    targetRectHeight = element.getBoundingClientRect().height
+                    radius = element.style.borderRadius + 20;
+                    lerpSpeed = 0.04;
+                    currentHover = element;
+                }
+            }
+
+            targetRectCenterX = lerp(targetRectCenterX, clientX, 0.01);
+            targetRectCenterY = lerp(targetRectCenterY, clientY, 0.01);
+
+            // Smoothly lerp target rect to hover rect
+
+            /*
+            hoverRectCenterX = lerp(hoverRectCenterX, targetRectCenterX, lerpSpeed);
+            hoverRectCenterY = lerp(hoverRectCenterY, targetRectCenterY, lerpSpeed);
+            hoverRectWidth = lerp(hoverRectWidth, targetRectWidth, lerpSpeed);
+            hoverRectHeight = lerp(hoverRectHeight, targetRectHeight, lerpSpeed);
+            */
+
+            //use velocity system for rect
+
+            targetRectWidth += 20;
+            targetRectHeight += 20;
+            
+            hoverXVelocity += (targetRectCenterX - hoverRectCenterX) * 0.01;
+            hoverYVelocity += (targetRectCenterY - hoverRectCenterY) * 0.01;
+            hoverScaleXVelocity += (targetRectWidth - hoverRectWidth) * 0.01;
+            hoverScaleYVelocity += (targetRectHeight - hoverRectHeight) * 0.01;
+
+            
+            if (targetRectCenterX == clientX && targetRectCenterY == clientY) {
+                hoverXVelocity *= 0.95;
+                hoverYVelocity *= 0.95;
+                hoverScaleXVelocity *= 0.95;
+                hoverScaleYVelocity *= 0.95;
+            } else {
+                hoverXVelocity *= 0.89;
+                hoverYVelocity *= 0.89;
+                hoverScaleXVelocity *= 0.91;
+                hoverScaleYVelocity *= 0.91;
+            }
+
+            hoverRectCenterX += hoverXVelocity;
+            hoverRectCenterY += hoverYVelocity;
+            hoverRectWidth += hoverScaleXVelocity;
+            hoverRectHeight += hoverScaleYVelocity;
+
+            // Set hover pane position and size
+            hoverPane.style.position = "fixed";
+            hoverPane.style.left = hoverRectCenterX - (hoverRectWidth / 2) + "px";
+            hoverPane.style.top = hoverRectCenterY - (hoverRectHeight / 2) + "px";
+            hoverPane.style.width = hoverRectWidth + "px";
+            hoverPane.style.height = hoverRectHeight + "px";
+            //hoverPane.style.borderRadius = lerp(borderPane.style.borderRadius, radius, 0.1) + "px";
+            hoverPane.style.borderRadius = radius + "px";
+            //Add slight glow in mouse pane around true mouse position, with background radial gradient and not the middle of circle being at an unexpected position in pane
+            hoverPane.style.background = "radial-gradient(circle at " + (clientX - hoverPane.offsetLeft) + "px " + (clientY - hoverPane.offsetTop) + "px, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.0) 100%)";
+            if (previousHover != null && previousHover != currentHover) {
+                previousHover.classList.remove("front");
+            }
+            if (currentHover != null) {
+                currentHover.classList.add("front");
+            }
+            previousHover = currentHover;
+        },1);
+
+        function lerp(start, end, amt) {
+            return (1 - amt) * start + amt * end;
+        }
+    </script>
+</body>
+</html>
