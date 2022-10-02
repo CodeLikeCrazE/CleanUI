@@ -205,15 +205,17 @@
 
             // Smoothly lerp target rect to hover rect
 
-            /*
+            targetRectWidth += 20;
+            targetRectHeight += 20;            
             hoverRectCenterX = lerp(hoverRectCenterX, targetRectCenterX, lerpSpeed);
             hoverRectCenterY = lerp(hoverRectCenterY, targetRectCenterY, lerpSpeed);
             hoverRectWidth = lerp(hoverRectWidth, targetRectWidth, lerpSpeed);
             hoverRectHeight = lerp(hoverRectHeight, targetRectHeight, lerpSpeed);
-            */
+            
 
             //use velocity system for rect
 
+            /*
             targetRectWidth += 20;
             targetRectHeight += 20;
             
@@ -239,6 +241,7 @@
             hoverRectCenterY += hoverYVelocity;
             hoverRectWidth += hoverScaleXVelocity;
             hoverRectHeight += hoverScaleYVelocity;
+            */
 
             // Set hover pane position and size
             hoverPane.style.position = "fixed";
