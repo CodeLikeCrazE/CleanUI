@@ -119,6 +119,19 @@
         input[type="range"] {
             box-shadow : none;
         }
+        *[pretty-hover="lift"] {
+            transition : 0.25s;
+        }
+        input[type="button"][pretty-hover="lift"], button[pretty-hover="lift"] {
+            padding-left : 20px;
+            padding-right : 20px;
+            color:white;
+            background : rgb(0,128,255);
+        }
+        .lift {
+            transform:scale(1.05);
+            box-shadow : 0 10px 20px rgba(0,128,255,0.5);
+        }
     </style>
 </head>
 <body class="">
@@ -129,19 +142,21 @@
     </div>
     <br>
     <br>
-    <input type="text" placeholder="Search" pretty-hover="default"/>
+    <input type="text" placeholder="Search" pretty-hover="bar"/>
     <br>
     <input type="range" placeholder="Slider" pretty-hover="default"/>
     <br>
-    <input type="checkbox" placeholder="Checkbox" pretty-hover="default"/><label pretty-hover="default">Checkbox</label>
+    <input type="checkbox" placeholder="Checkbox" pretty-hover="default">
+    <label>Checkbox</label></input>
     <br>
-    <input type="text" placeholder="Text" pretty-hover="default"/>
-    <input type="password" placeholder="Password" pretty-hover="default"/>
-    <input type="email" placeholder="Email" pretty-hover="default"/>
-    <input type="url" placeholder="URL" pretty-hover="default"/>
-    <input type="tel" placeholder="Phone" pretty-hover="default"/>
-    <input type="number" placeholder="Number" pretty-hover="default"/>
-    <img src="https://source.unsplash.com/random/1920x1080/?wallpaper,landscape" pretty-hover="default">
+    <input type="text" placeholder="Text" pretty-hover="bar"/>
+    <input type="password" placeholder="Password" pretty-hover="bar"/>
+    <input type="email" placeholder="Email" pretty-hover="bar"/>
+    <input type="url" placeholder="URL" pretty-hover="bar"/>
+    <input type="tel" placeholder="Phone" pretty-hover="bar"/>
+    <input type="number" placeholder="Number" pretty-hover="bar"/>
+    <input type="button" value="Button" pretty-hover="lift"/>
+    <img src="https://picsum.photos/200/100" pretty-hover="lift">
     <div id="hoverPane"></div>
     <script>
         var targetRectCenterX = 0;
@@ -170,11 +185,21 @@
         window.onmousemove = function(e) {
             clientX = e.clientX;
             clientY = e.clientY;
+            console.log(e);
+            //hoverRectCenterX += e.movementX;
+            //hoverRectCenterY += e.movementY;
+        }
+
+        document.body.onclick = (e) => {
+            //document.body.requestPointerLock();
+            //e.preventDefault();
         }
 
         setInterval(()=>{
             // Get any elements with pretty-hover = default and if mouse hovering set target rect
 
+            //clientX = hoverRectCenterX;
+            //clientY = hoverRectCenterY;
             var targetRectCenterX = clientX;
             var targetRectCenterY = clientY;
             var targetRectWidth = 0;
@@ -200,29 +225,51 @@
                 }
             }
 
+            var elements = document.querySelectorAll("[pretty-hover='lift']");
+            for(var i = 0; i < elements.length; i++) {
+                var element = elements[i];
+                if(element.getBoundingClientRect().top <= clientY && element.getBoundingClientRect().bottom >= clientY && element.getBoundingClientRect().left <= clientX && element.getBoundingClientRect().right >= clientX) {
+                    element.classList.add("lift");
+                } else {
+                    element.classList.remove("lift");
+                }
+            }
+
+            var elements = document.querySelectorAll("[pretty-hover='bar']");
+            for(var i = 0; i < elements.length; i++) {
+                var element = elements[i];
+                if(element.getBoundingClientRect().top <= clientY && element.getBoundingClientRect().bottom >= clientY && element.getBoundingClientRect().left <= clientX && element.getBoundingClientRect().right >= clientX) {
+                    targetRectWidth = -14;
+                    targetRectHeight = 8;
+                    //if (element.nodeType == "input") {
+                        targetRectCenterY = element.getBoundingClientRect().y + element.getBoundingClientRect().height / 2;
+                    //}
+                }
+            }
+
             targetRectCenterX = lerp(targetRectCenterX, clientX, 0.01);
             targetRectCenterY = lerp(targetRectCenterY, clientY, 0.01);
 
             // Smoothly lerp target rect to hover rect
 
-            targetRectWidth += 20;
+            /*targetRectWidth += 20;
             targetRectHeight += 20;            
             hoverRectCenterX = lerp(hoverRectCenterX, targetRectCenterX, lerpSpeed);
             hoverRectCenterY = lerp(hoverRectCenterY, targetRectCenterY, lerpSpeed);
             hoverRectWidth = lerp(hoverRectWidth, targetRectWidth, lerpSpeed);
             hoverRectHeight = lerp(hoverRectHeight, targetRectHeight, lerpSpeed);
-            
+            */
 
             //use velocity system for rect
 
-            /*
+            
             targetRectWidth += 20;
             targetRectHeight += 20;
             
-            hoverXVelocity += (targetRectCenterX - hoverRectCenterX) * 0.01;
-            hoverYVelocity += (targetRectCenterY - hoverRectCenterY) * 0.01;
-            hoverScaleXVelocity += (targetRectWidth - hoverRectWidth) * 0.01;
-            hoverScaleYVelocity += (targetRectHeight - hoverRectHeight) * 0.01;
+            hoverXVelocity += (targetRectCenterX - hoverRectCenterX) * 0.005;
+            hoverYVelocity += (targetRectCenterY - hoverRectCenterY) * 0.005;
+            hoverScaleXVelocity += (targetRectWidth - hoverRectWidth) * 0.005;
+            hoverScaleYVelocity += (targetRectHeight - hoverRectHeight) * 0.005;
 
             
             if (targetRectCenterX == clientX && targetRectCenterY == clientY) {
@@ -241,7 +288,7 @@
             hoverRectCenterY += hoverYVelocity;
             hoverRectWidth += hoverScaleXVelocity;
             hoverRectHeight += hoverScaleYVelocity;
-            */
+            
 
             // Set hover pane position and size
             hoverPane.style.position = "fixed";
